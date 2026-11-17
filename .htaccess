@@ -1,0 +1,28 @@
+# .htaccess — ตั้งค่า Apache ของร้านสวนสุข (XAMPP เปิดใช้ได้เลย ไม่ต้องแก้อะไร ย้ายโฟลเดอร์/เปลี่ยนชื่อได้)
+# หมายเหตุ: ต้องเปิด mod_rewrite และ AllowOverride (XAMPP ตั้งไว้ให้แล้ว) ถ้าไม่เปิด ไฟล์นี้จะถูกข้ามและเว็บยังทำงานปกติ
+
+# 1) หน้า 404 สวยงาม: ที่อยู่ไหนไม่มีอยู่จริง ให้แสดง 404.php (404.php ตอบรหัส 404 เอง)
+#    ใช้ RewriteRule แทน ErrorDocument เพื่อไม่ต้องผูกกับชื่อโฟลเดอร์ (เช่น /plantshop/)
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+# รูป/CSS/JS ที่หายให้ตอบ 404 ธรรมดา ไม่ต้องส่งทั้งหน้าเว็บ
+RewriteCond %{REQUEST_URI} !\.(png|jpe?g|gif|webp|svg|ico|css|js|map|woff2?|ttf)$ [NC]
+RewriteRule ^ 404.php [L]
+</IfModule>
+
+# 2) ไม่ให้เปิดดูรายชื่อไฟล์ในโฟลเดอร์
+Options -Indexes
+
+# 3) ไฟล์ฐานข้อมูล/เอกสาร/ไฟล์สำรอง ห้ามเปิดจากเว็บ (นำเข้าผ่าน phpMyAdmin ได้ตามปกติ)
+<FilesMatch "\.(sql|md|log|bak|sqlite|ini)$">
+Require all denied
+</FilesMatch>
+
+# 4) ส่วนหัวความปลอดภัยพื้นฐาน
+<IfModule mod_headers.c>
+Header always set X-Content-Type-Options "nosniff"
+Header always set X-Frame-Options "SAMEORIGIN"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
